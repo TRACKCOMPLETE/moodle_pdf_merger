@@ -113,7 +113,7 @@ class MainWindow:
         self.drop_area.create_text(
             width // 2,
             height // 2 + 18,
-            text="ここに ZIP を落としてや",
+            text="ここに ZIP をドラッグ＆ドロップしてください",
             font=("TkDefaultFont", 11),
             fill="#555555",
         )
@@ -148,7 +148,7 @@ class MainWindow:
             return
 
         if self._processing:
-            self.log("[WARNING] いま処理中やから、終わるまで待ってな")
+            self.log("[WARNING] 処理中のため無視")
             return
 
         self._processing = True
@@ -190,7 +190,7 @@ class MainWindow:
             )
             self._set_drop_message("ZIPファイルをここへドラッグ＆ドロップ")
         else:
-            self.log("[ERROR] 処理は完了したけど、出力できへんかった")
+            self.log("[ERROR] 処理は完了しましたが、出力PDFは生成されませんでした。")
             self._set_status("失敗")
             self._set_drop_message("ZIPファイルをここへドラッグ＆ドロップ")
 
@@ -218,9 +218,16 @@ class MainWindow:
         self._status_text.set(message)
 
     def log(self, message: str):
+        # ログ追加前に、一番下までスクロールしているか確認
+        at_bottom = self.log_text.yview()[1] >= 0.999
+
         self.log_text.configure(state="normal")
         self.log_text.insert("end", message + "\n")
-        self.log_text.see("end")
+
+        # 一番下にいた場合のみ自動スクロール
+        if at_bottom:
+            self.log_text.see("end")
+
         self.log_text.configure(state="disabled")
 
     def run(self):
